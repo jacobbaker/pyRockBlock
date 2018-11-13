@@ -98,9 +98,9 @@ class rockBlock(object):
     def ping(self):
         self._ensureConnectionStatus()
 
-        command = "AT"
+        command = b"AT"
 
-        self.s.writbe(command + b"\r")
+        self.s.write(command + b"\r")
 
         if(self.s.readline().strip() == command):
 
@@ -438,9 +438,9 @@ class rockBlock(object):
                     self.s.readline()  # OK
 
                     # +SBDIX:<MO status>,<MOMSN>,<MT status>,<MTMSN>,<MT length>,<MTqueued>
-                    response = response.replace("+SBDIX: ", "")
+                    response = response.replace(b"+SBDIX: ", b"")
 
-                    parts = response.split(",")
+                    parts = response.decode().split(",")
 
                     moStatus = int(parts[0])
                     moMsn = int(parts[1])
@@ -587,17 +587,17 @@ class rockBlock(object):
     def _clearMoBuffer(self):
         self._ensureConnectionStatus()
 
-        command = "AT+SBDD0"
+        command = b"AT+SBDD0"
 
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
 
         if(self.s.readline().strip() == command):
 
-            if(self.s.readline().strip() == "0"):
+            if(self.s.readline().strip() == b"0"):
 
                 self.s.readline()  # BLANK
 
-                if(self.s.readline().strip() == "OK"):
+                if(self.s.readline().strip() == b"OK"):
 
                     return True
 

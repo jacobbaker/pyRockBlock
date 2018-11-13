@@ -86,11 +86,11 @@ class rockBlock(object):
                 
         command = "AT"
                 
-        self.s.write(command + "\r")
+        self.s.writbe(command + b"\r")
         
         if( self.s.readline().strip() == command ):
             
-            if( self.s.readline().strip() == "OK" ):
+            if( self.s.readline().strip() == b"OK" ):
                                                          
                 return True
                                             
@@ -110,22 +110,22 @@ class rockBlock(object):
     def requestSignalStrength(self):
         self._ensureConnectionStatus()
 
-        command = "AT+CSQ"
+        command = b"AT+CSQ"
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
              
         if( self.s.readline().strip() == command):
         
             response = self.s.readline().strip()
                   
-            if( response.find("+CSQ") >= 0 ):
+            if( b'+CSQ' in response):
                             
                 self.s.readline().strip()    #OK
                 self.s.readline().strip()    #BLANK
                                         
                 if( len(response) == 6):
                 
-                    return int( response[5] )
+                    return int( response.decode()[5] )
             
         return -1   
      
@@ -232,35 +232,35 @@ class rockBlock(object):
         
         
         #Disable Flow Control
-        command = "AT&K0"
+        command = b"AT&K0"
                 
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
-        if(self.s.readline().strip() == command and self.s.readline().strip() == "OK"):
+        if(self.s.readline().strip() == command and self.s.readline().strip() == b"OK"):
           
             
             #Store Configuration into Profile0
-            command = "AT&W0"
+            command = b"AT&W0"
                 
-            self.s.write(command + "\r")
+            self.s.write(command + b"\r")
             
-            if(self.s.readline().strip() == command and self.s.readline().strip() == "OK"):
+            if(self.s.readline().strip() == command and self.s.readline().strip() == b"OK"):
           
             
                 #Use Profile0 as default
-                command = "AT&Y0"
+                command = b"AT&Y0"
                     
-                self.s.write(command + "\r")
+                self.s.write(command + b"\r")
                 
-                if(self.s.readline().strip() == command and self.s.readline().strip() == "OK"):    
+                if(self.s.readline().strip() == command and self.s.readline().strip() == b"OK"):    
                     
                     
                     #Flush Memory
-                    command = "AT*F"
+                    command = b"AT*F"
                     
-                    self.s.write(command + "\r")
+                    self.s.write(command + b"\r")
                 
-                    if(self.s.readline().strip() == command and self.s.readline().strip() == "OK"):
+                    if(self.s.readline().strip() == command and self.s.readline().strip() == b"OK"):
                                                 
                         #self.close()
                         
@@ -312,19 +312,19 @@ class rockBlock(object):
                 
         if( len(msg) > 340):
                
-            print "sendMessageWithBytes bytes should be <= 340 bytes"
+            print("sendMessageWithBytes bytes should be <= 340 bytes")
             
             return False
         
         
-        command = "AT+SBDWB=" + str( len(msg) )
+        command = b"AT+SBDWB=" + (str( len(msg) ).encode())
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
         
         if(self.s.readline().strip() == command):
            
-            if(self.s.readline().strip() == "READY"):
+            if(self.s.readline().strip() == b"READY"):
                 
                 checksum = 0
                 
@@ -333,16 +333,16 @@ class rockBlock(object):
                     checksum = checksum + ord(c)
                 
                                 
-                self.s.write( str(msg) )
+                self.s.write( str(msg).encode() )
                 
-                self.s.write( chr( checksum >> 8 ) )
-                self.s.write( chr( checksum & 0xFF ) )
+                self.s.write( chr( checksum >> 8 ).encode() )
+                self.s.write( chr( checksum & 0xFF ).encode() )
                                        
                 self.s.readline().strip()   #BLANK
                 
                 result = False
                                 
-                if(self.s.readline().strip() == "0"):
+                if(self.s.readline().strip() == b"0"):
                 
                     result = True
                                                     
@@ -368,15 +368,15 @@ class rockBlock(object):
     def _enableEcho(self):
         self._ensureConnectionStatus()
         
-        command = "ATE1"
+        command = b"ATE1"
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
         response = self.s.readline().strip()
         
         if(response == command or response == ""):
                  
-            if( self.s.readline().strip() == "OK" ):
+            if( self.s.readline().strip() == b"OK" ):
                 
                 return True
     
@@ -386,13 +386,13 @@ class rockBlock(object):
     def _disableFlowControl(self):
         self._ensureConnectionStatus()
         
-        command = "AT&K0"
+        command = b"AT&K0"
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
         if(self.s.readline().strip() == command):
              
-            if( self.s.readline().strip() == "OK" ):
+            if( self.s.readline().strip() == b"OK" ):
                 
                 return True
                         
@@ -402,13 +402,13 @@ class rockBlock(object):
     def _disableRingAlerts(self):
         self._ensureConnectionStatus()
                 
-        command = "AT+SBDMTA=0"
+        command = b"AT+SBDMTA=0"
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
         if( self.s.readline().strip() == command ):
             
-            if( self.s.readline().strip() == "OK" ):
+            if( self.s.readline().strip() == b"OK" ):
                             
                 return True
             
@@ -427,15 +427,15 @@ class rockBlock(object):
             
             SESSION_ATTEMPTS = SESSION_ATTEMPTS - 1
                          
-            command = "AT+SBDIX"
+            command = b"AT+SBDIX"
             
-            self.s.write(command + "\r")
+            self.s.write(command + b"\r")
             
             if( self.s.readline().strip() == command ):
                 
                 response = self.s.readline().strip()
             
-                if( response.find("+SBDIX:") >= 0 ):
+                if( b'+SBDIX' in response ):
             
                     self.s.readline()   #BLANK
                     self.s.readline()   #OK
@@ -533,7 +533,7 @@ class rockBlock(object):
                         
             if(SIGNAL_ATTEMPTS == 0 or signal < 0):
                 
-                print  "NO SIGNAL"
+                print ("NO SIGNAL")
                                 
                 if(self.callback != None and callable(self.callback.rockBlockSignalFail) ): 
                     self.callback.rockBlockSignalFail()
@@ -547,7 +547,7 @@ class rockBlock(object):
                 if(self.callback != None and callable(self.callback.rockBlockSignalPass) ): 
                     self.callback.rockBlockSignalPass()
                                     
-                return True;
+                return True
             
             
             SIGNAL_ATTEMPTS = SIGNAL_ATTEMPTS - 1
@@ -564,7 +564,7 @@ class rockBlock(object):
           
         if( response == "OK" ):
         
-            print "No message content.. strange!"
+            print("No message content.. strange!")
             
             if(self.callback != None and callable(self.callback.rockBlockRxReceived) ): 
                 self.callback.rockBlockRxReceived(mtMsn, "")
@@ -582,15 +582,15 @@ class rockBlock(object):
     def _isNetworkTimeValid(self):
         self._ensureConnectionStatus()
         
-        command = "AT-MSSTM"
+        command = b"AT-MSSTM"
         
-        self.s.write(command + "\r")
+        self.s.write(command + b"\r")
         
         if( self.s.readline().strip() == command ):  #Echo
             
             response = self.s.readline().strip()
         
-            if( response.startswith("-MSSTM") ):    #-MSSTM: a5cb42ad / no network service
+            if( b"-MSSTM" in response ):    #-MSSTM: a5cb42ad / no network service
                 
                 self.s.readline()   #OK
                 self.s.readline()   #BLANK
